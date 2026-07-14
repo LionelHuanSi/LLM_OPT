@@ -53,6 +53,8 @@ async def send_request(session, url, request_data, arrival_offset_ms, start_time
     headers = {"Content-Type": "application/json"}
     # Force streaming to accurately capture TTFT and TPOT
     payload = dict(body)
+    if "VLLM_MODEL_OVERRIDE" in os.environ:
+        payload["model"] = os.environ["VLLM_MODEL_OVERRIDE"]
     payload["stream"] = True
     
     try:
@@ -105,6 +107,11 @@ async def send_request(session, url, request_data, arrival_offset_ms, start_time
 async def run_benchmark(trace_file, endpoint_url):
     with open(trace_file, "r", encoding="utf-8") as f:
         requests = [json.loads(line) for line in f if line.strip()]
+
+    limit = int(os.environ.get("VLLM_LIMIT_REQUESTS", -1))
+    if limit > 0:
+        requests = requests[:limit]
+        print(f"Limiting workload to the first {limit} requests.")
 
     print(f"Loaded {len(requests)} requests from {trace_file}")
     print(f"Target Endpoint: {endpoint_url}")
