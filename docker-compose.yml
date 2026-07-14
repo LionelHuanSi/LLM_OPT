@@ -11,11 +11,13 @@ services:
       - --host=0.0.0.0 #Don't change this to vllm-server
       - --port=8000 #Don't change this to vllm-server
       - --max-model-len=49152
-      - --gpu-memory-utilization=0.90
+      - --gpu-memory-utilization=0.92
       - --tensor-parallel-size=1
       - --enable-prefix-caching
       - --enable-chunked-prefill
-      - --max-num-batched-tokens=2048
+      - --kv-cache-dtype=fp8
+      - --attention-backend=FLASHINFER
+      - --max-num-batched-tokens=4096
       - --max-num-seqs=64
       - --swap-space=0
       - --disable-log-requests
